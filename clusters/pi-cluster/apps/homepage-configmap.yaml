@@ -53,3 +53,11 @@ data:
           - name: Vaultwarden
             icon: bitwarden.png
             href: https://vaultwarden.k3s.tophermayor.com
+
+  docker.yaml: |
+    # Docker integration disabled
+    # This is optional and can be configured later
+
+  services.yaml: |
+    # Additional services configuration
+    # This is optional and can be configured later
