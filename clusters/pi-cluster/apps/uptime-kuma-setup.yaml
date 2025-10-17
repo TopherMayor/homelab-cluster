@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uptime-kuma-setup
+data:
+  setup.sh: |
+    #!/bin/bash
+    set -e
+    
+    # Wait for Uptime Kuma to be ready
+    echo "Waiting for Uptime Kuma to be ready..."
+    for i in {1..30}; do
+      if curl -s "$KUMA_URL" > /dev/null; then
+        echo "Uptime Kuma is ready!"
+        break
+      fi
+      echo "Attempt $i: Waiting for Uptime Kuma..."
+      sleep 2
+    done
+    
+    # Base URL for Uptime Kuma API
+    KUMA_URL="http://uptime-kuma:3001"
+    
+    # Create default admin user
+    echo "Setting up admin user..."
+    RESPONSE=$(curl -s -X POST "$KUMA_URL/setup" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "password": "admin123",
+        "username": "admin"
+      }')
+    
+    echo "Setup response: $RESPONSE"
+    
+    # Get JWT token
+    echo "Getting authentication token..."
+    TOKEN_RESPONSE=$(curl -s -X POST "$KUMA_URL/api/login" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "username": "admin",
+        "password": "admin123"
+      }')
+    
+    # Extract token using sed (no jq available)
+    TOKEN=$(echo "$TOKEN_RESPONSE" | sed 's/.*"token":"\([^"]*\)".*/\1/')
+    
+    if [ -z "$TOKEN" ]; then
+      echo "Failed to get token. Response: $TOKEN_RESPONSE"
+      exit 1
+    fi
+    
+    echo "Token: $TOKEN"
+    
+    # Function to create monitor
+    create_monitor() {
+      local name="$1"
+      local url="$2"
+      local type="$3"
+      local interval="$4"
+      
+      echo "Creating monitor: $name ($url)"
+      RESPONSE=$(curl -s -X POST "$KUMA_URL/api/monitors" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{
+          \"name\": \"$name\",
+          \"type\": \"$type\",
+          \"url\": \"$url\",
+          \"interval\": $interval,
+          \"keyword\": \"\",
+          \"notificationIDList\": []
+        }")
+      
+      echo "Monitor creation response: $RESPONSE"
+    }
+    
+    echo "Creating monitors for all services..."
+    
+    # Homepage Monitor
+    create_monitor "Homepage" "https://homepage.k3s.tophermayor.com" "http" 60
+    
+    # Traefik Dashboard Monitor
+    create_monitor "Traefik Dashboard" "https://traefik.k3s.tophermayor.com/dashboard/" "http" 60
+    
+    # AdGuard Monitor
+    create_monitor "AdGuard" "https://adguard.k3s.tophermayor.com" "http" 60
+    
+    # Code Server Monitor
+    create_monitor "Code Server" "https://code.k3s.tophermayor.com" "http" 60
+    
+    # Gitea Monitor
+    create_monitor "Gitea" "https://gitea.k3s.tophermayor.com" "http" 60
+    
+    # Home Assistant Monitor
+    create_monitor "Home Assistant" "https://homeassistant.k3s.tophermayor.com" "http" 60
+    
+    # Nextcloud Monitor
+    create_monitor "Nextcloud" "https://nextcloud.k3s.tophermayor.com" "http" 60
+    
+    # Portainer Monitor
+    create_monitor "Portainer" "https://portainer.k3s.tophermayor.com" "http" 60
+    
+    # Vaultwarden Monitor
+    create_monitor "Vaultwarden" "https://vaultwarden.k3s.tophermayor.com" "http" 60
+    
+    echo "Monitor setup completed!"
+    echo "Access Uptime Kuma at: https://uptime.k3s.tophermayor.com"
+    echo "Login with: admin / admin123"

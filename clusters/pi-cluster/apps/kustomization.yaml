@@ -8,3 +8,4 @@ resources:
 - homepage.yaml
 - homepage-configmap.yaml
 - wildcard-cert.yaml
+- uptime-kuma.yaml
