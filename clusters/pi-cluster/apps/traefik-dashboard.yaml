@@ -34,39 +34,42 @@ spec:
     scheme: https
     permanent: true
 ---
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: traefik-dashboard
   namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-https-redirect@kubernetescrd,kube-system-traefik-dashboard-redirect@kubernetescrd
 spec:
-  entryPoints:
-  - websecure
-  routes:
-  - match: Host(`traefik.k3s.tophermayor.com`) && (PathPrefix(`/`) || PathPrefix(`/dashboard`) || PathPrefix(`/api`))
-    kind: Rule
-    services:
-    - name: traefik-dashboard
-      port: 8080
-    middlewares:
-    - name: traefik-dashboard-redirect
-    - name: https-redirect
+  ingressClassName: traefik
   tls:
+  - hosts:
+    - traefik.k3s.tophermayor.com
     secretName: wildcard-tophermayor-tls
----
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: traefik-dashboard-http
-  namespace: kube-system
-spec:
-  entryPoints:
-  - web
-  routes:
-  - match: Host(`traefik.k3s.tophermayor.com`)
-    kind: Rule
-    middlewares:
-    - name: https-redirect
-    services:
-    - name: traefik-dashboard
-      port: 8080
+  rules:
+  - host: traefik.k3s.tophermayor.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-dashboard
+            port:
+              number: 8080
+      - path: /dashboard
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-dashboard
+            port:
+              number: 8080
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-dashboard
+            port:
+              number: 8080
