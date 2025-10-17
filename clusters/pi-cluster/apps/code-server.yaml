@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: code-server
+  labels:
+    app: code-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server
+  template:
+    metadata:
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+      labels:
+        app: code-server
+    spec:
+      containers:
+      - name: code-server
+        image: codercom/code-server:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PASSWORD
+          value: "code123"
+        volumeMounts:
+        - name: code-data
+          mountPath: /home/coder/project
+      volumes:
+      - name: code-data
+        persistentVolumeClaim:
+          claimName: code-server-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: code-server
+spec:
+  selector:
+    app: code-server
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: code-server
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - code-server.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
+  rules:
+  - host: code.k3s.tophermayor.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: code-server
+            port:
+              number: 8080

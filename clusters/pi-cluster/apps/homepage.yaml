@@ -17,6 +17,19 @@ spec:
         image: ghcr.io/gethomepage/homepage:latest
         ports:
         - containerPort: 3000
+        volumeMounts:
+        - name: homepage-data
+          mountPath: /app/config
+        - name: homepage-config
+          mountPath: /app/config/settings.yaml
+          subPath: settings.yaml
+      volumes:
+      - name: homepage-data
+        persistentVolumeClaim:
+          claimName: homepage-data
+      - name: homepage-config
+        configMap:
+          name: homepage-settings
 ---
 apiVersion: v1
 kind: Service

@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: home-assistant
+  labels:
+    app: home-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant
+  template:
+    metadata:
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+      labels:
+        app: home-assistant
+    spec:
+      containers:
+      - name: home-assistant
+        image: homeassistant/home-assistant:stable
+        ports:
+        - containerPort: 8123
+        env:
+        - name: TZ
+          value: "America/Los_Angeles"
+        volumeMounts:
+        - name: ha-config
+          mountPath: /config
+      volumes:
+      - name: ha-config
+        persistentVolumeClaim:
+          claimName: home-assistant-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: home-assistant
+spec:
+  selector:
+    app: home-assistant
+  ports:
+  - port: 8123
+    targetPort: 8123
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: home-assistant
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - home-assistant.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
+  rules:
+  - host: homeassistant.k3s.tophermayor.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: home-assistant
+            port:
+              number: 8123

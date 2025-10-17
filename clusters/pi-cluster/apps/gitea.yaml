@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: gitea
+  labels:
+    app: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+      labels:
+        app: gitea
+    spec:
+      containers:
+      - name: gitea
+        image: gitea/gitea:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GITEA__database__DB_TYPE
+          value: "sqlite3"
+        - name: GITEA__server__DOMAIN
+          value: "gitea.k3s.tophermayor.com"
+        - name: GITEA__server__ROOT_URL
+          value: "https://gitea.k3s.tophermayor.com/"
+        - name: GITEA__server__HTTP_PORT
+          value: "3000"
+        volumeMounts:
+        - name: gitea-data
+          mountPath: /data
+      volumes:
+      - name: gitea-data
+        persistentVolumeClaim:
+          claimName: gitea-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: gitea
+spec:
+  selector:
+    app: gitea
+  ports:
+  - port: 3000
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: gitea
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - gitea.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
+  rules:
+  - host: gitea.k3s.tophermayor.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gitea
+            port:
+              number: 3000

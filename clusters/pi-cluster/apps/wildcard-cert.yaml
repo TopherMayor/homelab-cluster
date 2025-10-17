@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-tophermayor
+  namespace: default
+spec:
+  secretName: wildcard-tophermayor-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "*.tophermayor.com"
+  - "tophermayor.com"

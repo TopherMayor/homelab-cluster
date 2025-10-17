@@ -30,11 +30,10 @@ spec:
           mountPath: /opt/adguardhome/work
       volumes:
       - name: config
-        hostPath:
-          path: /opt/adguardhome/conf
+        persistentVolumeClaim:
+          claimName: adguard-data
       - name: work
-        hostPath:
-          path: /opt/adguardhome/work
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -67,10 +66,15 @@ kind: Ingress
 metadata:
   name: adguard
   annotations:
-    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
 spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - adguard.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
   rules:
-  - host: adguard.local
+  - host: adguard.k3s.tophermayor.com
     http:
       paths:
       - path: /

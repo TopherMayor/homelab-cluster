@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: nextcloud
+  namespace: default
+  labels:
+    app: nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+      labels:
+        app: nextcloud
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 2000
+        fsGroup: 2000
+      containers:
+      - name: nextcloud
+        image: nextcloud:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service.default.svc.cluster.local"
+        - name: MYSQL_DATABASE
+          value: "nextcloud"
+        - name: MYSQL_USER
+          value: "nextcloud"
+        - name: MYSQL_PASSWORD
+          value: "nextcloud123"
+        - name: NEXTCLOUD_ADMIN_USER
+          value: "admin"
+        - name: NEXTCLOUD_ADMIN_PASSWORD
+          value: "admin123"
+        volumeMounts:
+        - name: nextcloud-data
+          mountPath: /var/www/html
+      volumes:
+      - name: nextcloud-data
+        persistentVolumeClaim:
+          claimName: nextcloud-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: nextcloud
+  namespace: default
+spec:
+  selector:
+    app: nextcloud
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  name: nextcloud
+  namespace: default
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - nextcloud.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
+  rules:
+  - host: nextcloud.k3s.tophermayor.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nextcloud
+            port:
+              number: 80
