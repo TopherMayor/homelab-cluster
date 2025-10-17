@@ -41,13 +41,15 @@ metadata:
   namespace: kube-system
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/issue-temporary-certificate: "true"
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-https-redirect@kubernetescrd,kube-system-traefik-dashboard-redirect@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
   - hosts:
     - traefik.k3s.tophermayor.com
-    secretName: wildcard-tophermayor-tls
+    secretName: traefik-dashboard-tls
   rules:
   - host: traefik.k3s.tophermayor.com
     http:

@@ -57,13 +57,15 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/issue-temporary-certificate: "true"
     traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
   - hosts:
     - homepage.k3s.tophermayor.com
-    secretName: wildcard-tophermayor-tls
+    secretName: homepage-tls
   rules:
   - host: homepage.k3s.tophermayor.com
     http:
