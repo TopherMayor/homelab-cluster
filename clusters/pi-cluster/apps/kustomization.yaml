@@ -43,7 +43,6 @@ resources:
 - traefik-simple.yaml
 - temp-nodeports.yaml
 - flux-sync.yaml
-- coredns-config.yaml
 namespace: default
 commonLabels:
   app.kubernetes.io/name: homelab-cluster

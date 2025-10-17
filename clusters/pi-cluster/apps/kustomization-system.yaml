@@ -12,7 +12,7 @@ spec:
     name: homelab-cluster
   targetNamespace: kube-system
 resources:
-  - coredns-config.yaml
+  - coredns-config-fixed.yaml
 commonLabels:
   app.kubernetes.io/part-of: homelab-cluster
   app.kubernetes.io/managed-by: flux
