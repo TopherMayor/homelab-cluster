@@ -13,6 +13,17 @@ spec:
     targetPort: 8080
     name: dashboard
 ---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-redirect
+  namespace: kube-system
+spec:
+  redirectRegex:
+    regex: ^https://traefik\.k3s\.tophermayor\.com/?$
+    replacement: https://traefik.k3s.tophermayor.com/dashboard/
+    permanent: true
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -20,7 +31,7 @@ metadata:
   namespace: kube-system
   annotations:
     kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-traefik-dashboard-redirect@kubernetescrd,default-https-redirect@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -31,6 +42,13 @@ spec:
   - host: traefik.k3s.tophermayor.com
     http:
       paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-dashboard
+            port:
+              number: 8080
       - path: /dashboard
         pathType: Prefix
         backend:
