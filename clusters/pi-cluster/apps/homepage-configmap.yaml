@@ -1,10 +1,18 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: homepage-settings
   namespace: default
+  labels:
+    kustomize.toolkit.fluxcd.io/name: apps
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 data:
+  docker.yaml: |
+    # Docker integration disabled
+    # This is optional and can be configured later
+  services.yaml: |
+    # Additional services configuration
+    # This is optional and can be configured later
   settings.yaml: |
     # Homepage configuration
     providers:
@@ -14,50 +22,102 @@ data:
     # Basic homepage settings
     title: Homelab Dashboard
     theme: dark
+    layout:
+      style: row
+      columns: 4
+      background:
+        image: /images/background.jpg
+        opacity: 0.8
 
-    # Services configuration
+    # Services configuration - All deployed services with k3s.tophermayor.com endpoints
     services:
       - name: Management
         services:
-          - name: Portainer
-            icon: portainer.png
-            href: https://portainer.k3s.tophermayor.com
-          - name: Gitea
-            icon: gitea.png
-            href: https://gitea.k3s.tophermayor.com
-          - name: Code Server
-            icon: vscode.png
-            href: https://code.k3s.tophermayor.com
+          - name: Homepage
+            icon: home.png
+            description: Homelab Homepage
+            href: https://homepage.k3s.tophermayor.com
+            target: _blank
           - name: Traefik Dashboard
             icon: traefik.png
-            href: https://traefik.k3s.tophermayor.com
+            description: Traefik Reverse Proxy Dashboard
+            href: https://traefik.k3s.tophermayor.com/dashboard/
+            target: _blank
+          - name: Portainer
+            icon: portainer.png
+            description: Container Management Interface
+            href: https://portainer.k3s.tophermayor.com
+            target: _blank
+          - name: Gitea
+            icon: gitea.png
+            description: Git Repository Management
+            href: https://gitea.k3s.tophermayor.com
+            target: _blank
+          - name: Code Server
+            icon: vscode.png
+            description: VS Code in the Browser
+            href: https://code.k3s.tophermayor.com
+            target: _blank
           - name: Uptime Kuma
             icon: uptime-kuma.png
+            description: Uptime Monitoring Dashboard
             href: https://uptime.k3s.tophermayor.com
+            target: _blank
+      
       - name: Home & Automation
         services:
           - name: Home Assistant
             icon: home-assistant.png
+            description: Home Automation Hub
             href: https://homeassistant.k3s.tophermayor.com
-          - name: AdGuard
+            target: _blank
+          - name: AdGuard Home
             icon: adguard-home.png
+            description: DNS-based Ad Blocker
             href: https://adguard.k3s.tophermayor.com
+            target: _blank
           - name: Mosquitto
             icon: mqtt.png
+            description: MQTT Broker
             href: http://mosquitto.default.svc.cluster.local:1883
-      - name: Productivity
+            target: _blank
+      
+      - name: Productivity & Collaboration
         services:
           - name: Nextcloud
             icon: nextcloud.png
+            description: File Sync & Collaboration
             href: https://nextcloud.k3s.tophermayor.com
+            target: _blank
           - name: Vaultwarden
             icon: bitwarden.png
+            description: Password Manager
             href: https://vaultwarden.k3s.tophermayor.com
-
-  docker.yaml: |
-    # Docker integration disabled
-    # This is optional and can be configured later
-
-  services.yaml: |
-    # Additional services configuration
-    # This is optional and can be configured later
+            target: _blank
+      
+      - name: Database & Storage
+        services:
+          - name: MySQL Database
+            icon: mysql.png
+            description: MySQL Database Server
+            href: https://portainer.k3s.tophermayor.com/1/containers/mysql
+            target: _blank
+      
+      - name: Monitoring & System
+        services:
+          - name: Kubernetes Dashboard
+            icon: kubernetes.png
+            description: Kubernetes Cluster Dashboard
+            href: https://traefik.k3s.tophermayor.com/dashboard/kubernetes/
+            target: _blank
+          - name: Traefik Metrics
+            icon: prometheus.png
+            description: Traefik Metrics and Monitoring
+            href: https://traefik.k3s.tophermayor.com/metrics/
+            target: _blank
+          - name: Uptime Kuma
+            icon: uptime-kuma.png
+            description: Service Uptime Monitoring
+            href: https://uptime.k3s.tophermayor.com
+            target: _blank
+            ping: true
