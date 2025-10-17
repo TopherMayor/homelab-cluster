@@ -18,15 +18,23 @@ spec:
         ports:
         - containerPort: 3000
         volumeMounts:
-        - name: homepage-data
-          mountPath: /app/config
         - name: homepage-config
           mountPath: /app/config/settings.yaml
           subPath: settings.yaml
+        - name: homepage-config
+          mountPath: /app/config/docker.yaml
+          subPath: docker.yaml
+        - name: homepage-config
+          mountPath: /app/config/services.yaml
+          subPath: services.yaml
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: HOMEPAGE_ALLOWED_HOSTS
+          value: "homepage.k3s.tophermayor.com,homepage.local,localhost"
       volumes:
-      - name: homepage-data
-        persistentVolumeClaim:
-          claimName: homepage-data
       - name: homepage-config
         configMap:
           name: homepage-settings
@@ -48,9 +56,15 @@ metadata:
   name: homepage
   annotations:
     kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
 spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - homepage.k3s.tophermayor.com
+    secretName: wildcard-tophermayor-tls
   rules:
-  - host: homepage.local
+  - host: homepage.k3s.tophermayor.com
     http:
       paths:
       - path: /

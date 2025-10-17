@@ -10,3 +10,42 @@ data:
     providers:
       openweathermap: openweathermapapikey
       weatherapi: weatherapiapikey
+    
+    # Basic homepage settings
+    title: Homelab Dashboard
+    theme: dark
+    
+    # Services configuration
+    services:
+      - name: Management
+        services:
+          - name: Portainer
+            icon: portainer.png
+            href: http://portainer.local
+          - name: Gitea
+            icon: gitea.png
+            href: http://gitea.local
+          - name: Code Server
+            icon: vscode.png
+            href: http://code.local
+      - name: Media
+        services:
+          - name: Home Assistant
+            icon: home-assistant.png
+            href: http://homeassistant.local
+      - name: Productivity
+        services:
+          - name: Nextcloud
+            icon: nextcloud.png
+            href: http://nextcloud.local
+          - name: Vaultwarden
+            icon: bitwarden.png
+            href: http://vaultwarden.local
+  
+  docker.yaml: |
+    # Docker integration
+    # This is optional and can be configured later
+  
+  services.yaml: |
+    # Additional services configuration
+    # This is optional and can be configured later
