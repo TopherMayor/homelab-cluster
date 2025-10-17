@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  NodeHosts: |
+    192.168.254.22 homepage.k3s.tophermayor.com
+    192.168.254.22 adguard.k3s.tophermayor.com
+    192.168.254.22 code.k3s.tophermayor.com
+    192.168.254.22 gitea.k3s.tophermayor.com
+    192.168.254.22 homeassistant.k3s.tophermayor.com
+    192.168.254.22 nextcloud.k3s.tophermayor.com
+    192.168.254.22 portainer.k3s.tophermayor.com
+    192.168.254.22 vaultwarden.k3s.tophermayor.com
+    192.168.254.22 traefik.k3s.tophermayor.com
+    192.168.254.22 uptime.k3s.tophermayor.com
+    192.168.254.84 homepage.k3s.tophermayor.com
+    192.168.254.84 adguard.k3s.tophermayor.com
+    192.168.254.84 code.k3s.tophermayor.com
+    192.168.254.84 gitea.k3s.tophermayor.com
+    192.168.254.84 homeassistant.k3s.tophermayor.com
+    192.168.254.84 nextcloud.k3s.tophermayor.com
+    192.168.254.84 portainer.k3s.tophermayor.com
+    192.168.254.84 vaultwarden.k3s.tophermayor.com
+    192.168.254.84 traefik.k3s.tophermayor.com
+    192.168.254.84 uptime.k3s.tophermayor.com
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        hosts /etc/coredns/custom/NodeHosts {
+          ttl 60
+          reload 15s
+          fallthrough
+        }
+        hosts /etc/coredns/NodeHosts {
+          ttl 60
+          reload 15s
+          fallthrough
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+    }

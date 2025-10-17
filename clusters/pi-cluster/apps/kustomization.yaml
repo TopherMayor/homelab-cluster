@@ -1,11 +1,51 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: default
 resources:
+- cert-manager.yaml
+- cert-issuer.yaml
+- cloudflare-secret.yaml
+- cluster-issuer.yaml
+- selfsigned-issuer.yaml
+- letsencrypt-http-issuer.yaml
+- wildcard-cert.yaml
+- tlsstore.yaml
+- https-redirect.yaml
 - nfs-storageclass.yaml
+- nfs-nextcloud-storageclass.yaml
+- mysql-pvc.yaml
+- mysql.yaml
+- mosquitto-config.yaml
+- mosquitto.yaml
+- homepage.yaml
+- homepage-pvc.yaml
+- homepage-configmap.yaml
+- code-server.yaml
+- code-server-pvc.yaml
+- gitea.yaml
+- gitea-pvc.yaml
+- home-assistant.yaml
+- home-assistant-pvc.yaml
+- nextcloud.yaml
+- nextcloud-pvc.yaml
+- nextcloud-pvc-fresh.yaml
+- portainer.yaml
+- portainer-pvc.yaml
+- vaultwarden.yaml
+- vaultwarden-pvc.yaml
+- uptime-kuma.yaml
+- uptime-kuma-setup.yaml
+- uptime-kuma-job.yaml
 - adguard.yaml
 - adguard-pvc.yaml
-- homepage.yaml
-- homepage-configmap.yaml
-- wildcard-cert.yaml
-- uptime-kuma.yaml
+- traefik-dashboard.yaml
+- traefik-dashboard-nodeport.yaml
+- traefik-dashboard-kustomization.yaml
+- traefik-simple.yaml
+- temp-nodeports.yaml
+- flux-sync.yaml
+- coredns-config.yaml
+namespace: default
+commonLabels:
+  app.kubernetes.io/name: homelab-cluster
+commonAnnotations:
+  app.kubernetes.io/managed-by: "kustomize"
