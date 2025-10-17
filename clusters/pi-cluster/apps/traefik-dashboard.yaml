@@ -38,3 +38,10 @@ spec:
             name: traefik-dashboard
             port:
               number: 8080
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: traefik-dashboard
+            port:
+              number: 8080
