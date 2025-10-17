@@ -3,3 +3,8 @@ kind: Kustomization
 namespace: default
 resources:
 - nfs-storageclass.yaml
+- adguard.yaml
+- adguard-pvc.yaml
+- homepage.yaml
+- homepage-pvc.yaml
+- homepage-configmap.yaml
