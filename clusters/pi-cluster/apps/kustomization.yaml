@@ -8,4 +8,3 @@ resources:
 - homepage.yaml
 - homepage-configmap.yaml
 - wildcard-cert.yaml
-- traefik-dashboard.yaml
