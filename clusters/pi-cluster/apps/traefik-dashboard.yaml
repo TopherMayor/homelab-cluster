@@ -31,7 +31,7 @@ spec:
   - host: traefik.k3s.tophermayor.com
     http:
       paths:
-      - path: /
+      - path: /dashboard
         pathType: Prefix
         backend:
           service:
