@@ -27,6 +27,9 @@ spec:
         - name: homepage-config
           mountPath: /app/config/services.yaml
           subPath: services.yaml
+        - name: homepage-config
+          mountPath: /app/config/kubernetes.yaml
+          subPath: kubernetes.yaml
         env:
         - name: PUID
           value: "1000"
