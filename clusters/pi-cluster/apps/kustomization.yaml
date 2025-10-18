@@ -35,11 +35,11 @@ resources:
 - uptime-kuma-job.yaml
 - adguard.yaml
 - adguard-pvc.yaml
-- traefik-dashboard.yaml
-- traefik-dashboard-nodeport.yaml
+
 
 - traefik-simple.yaml
 - temp-nodeports.yaml
+- traefik-dashboard-kustomization.yaml
 - flux-sync.yaml
 namespace: default
 commonLabels:
