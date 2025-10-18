@@ -22,7 +22,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
     cert-manager.io/issue-temporary-certificate: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-https-redirect@kubernetescrd,kube-system-traefik-dashboard-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-https-redirect-kube-system@kubernetescrd,kube-system-traefik-dashboard-redirect@kubernetescrd
     traefik.ingress.kubernetes.io/service.serversscheme: http
 spec:
   ingressClassName: traefik
@@ -70,7 +70,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: https-redirect
+  name: https-redirect-kube-system
   namespace: kube-system
 spec:
   redirectScheme:
