@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - cert-manager.yaml
-- cert-issuer.yaml
 - cloudflare-secret.yaml
 - cluster-issuer.yaml
 - selfsigned-issuer.yaml
@@ -27,7 +26,6 @@ resources:
 - home-assistant-pvc.yaml
 - nextcloud.yaml
 - nextcloud-pvc.yaml
-- nextcloud-pvc-fresh.yaml
 - portainer.yaml
 - portainer-pvc.yaml
 - vaultwarden.yaml
@@ -39,7 +37,7 @@ resources:
 - adguard-pvc.yaml
 - traefik-dashboard.yaml
 - traefik-dashboard-nodeport.yaml
-- traefik-dashboard-kustomization.yaml
+
 - traefik-simple.yaml
 - temp-nodeports.yaml
 - flux-sync.yaml
